@@ -1,22 +1,23 @@
 import math
+from collections import deque
 
 import mesa
 
 # Stylized heterosexual dating market (ABM). Informed by common themes in mating
-# research — e.g. parental-investment logic (Trivers, 1972) as one reason *on
+# research - e.g. parental-investment logic (Trivers, 1972) as one reason *on
 # average* higher minimum investment in offspring is modeled as higher female
 # choosiness in many species; human mate-preference *averages* in large
 # surveys (e.g. Buss, 1989 and follow-ons) where men more heavily weight
 # physical attractiveness and women more heavily weight status/resource cues
-# *on average* — with huge within-sex variance, culture, cohort, and mating
+# *on average* - with huge within-sex variance, culture, cohort, and mating
 # context not represented here.
 #
-# This is a simulation for intuition, not a claim that all individuals follow these
+# This is a toy model for intuition, not a claim that all individuals follow these
 # rules, nor that the magnitudes are empirically calibrated. Prefer reading
-# outputs as comparative statics (“when parameter X rises, what happens?”)
+# outputs as comparative statics ("when parameter X rises, what happens?")
 # rather than as quantitative predictions about real dating markets.
 
-# --- Gale–Shapley (full information, stable matching) -------------------------
+# --- Gale-Shapley (full information, stable matching) -------------------------
 # Real dating is search under incomplete information and noise; GS is kept as a
 # benchmark: what happens if everyone knows everyone and runs optimal proposals.
 
@@ -33,11 +34,11 @@ def gale_shapley_men_optimal(men_prefs, women_prefs):
         woman_rank.append({m: pos for pos, m in enumerate(women_prefs[w])})
 
     next_proposal = [0] * n
-    free_men = list(range(n))
+    free_men = deque(range(n))
     woman_partner = [None] * n
 
     while free_men:
-        m = free_men.pop()
+        m = free_men.popleft()
         w = men_prefs[m][next_proposal[m]]
         next_proposal[m] += 1
 
@@ -92,7 +93,7 @@ class DatingMarket(mesa.Model):
     """
     Parameters default to a *stylized* sex difference: men weight women's
     attractiveness more than their resources; women weight men's resources
-    more than attractiveness — matching the *direction* of many cross-cultural
+    more than attractiveness - matching the *direction* of many cross-cultural
     survey averages, not calibrated effect sizes.
     """
 
